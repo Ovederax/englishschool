@@ -1,0 +1,37 @@
+@startuml
+    left to right direction    
+    User <|-- Tutor   
+    User <|-- Client
+
+    rectangle {
+        usecase ("Login")
+        usecase ("Register")
+        usecase ("ChangeProfile")
+
+        usecase ("CRUD Course")
+        usecase ("CRUD Lesson in Course")
+        usecase ("CRUD Material in Lesson")
+        usecase ("CRUD Category to Course")
+        usecase ("UD Category to Lesson")
+
+        usecase ("Buy Course")
+        usecase ("Read Lesson")
+        usecase ("Done Lesson")
+        usecase ("Get Course")
+
+        User -- ("Login")
+        User -- ("Register")
+        User -- ("Change profile")
+
+        Tutor -- ("CRUD Course")
+        Tutor -- ("CRUD Lesson in Course")
+        Tutor -- ("CRUD Material in Lesson")
+        Tutor -- ("CRUD Category to Course")
+        Tutor -- ("UD Category to Lesson")
+
+        Client -- ("Buy Course")
+        Client -- ("Read Lesson")
+        Client -- ("Done Lesson")
+        Client -- ("Get Course")
+    }
+@enduml

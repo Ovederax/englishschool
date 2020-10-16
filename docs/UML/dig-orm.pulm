@@ -1,0 +1,50 @@
+@startuml
+hide circle
+skinparam minClassWidth 170
+
+entity  Course {
+    name: String
+    author: Integer
+    price: Integer
+}
+
+entity User {
+    login: String
+    password: String
+    firstname: String
+    lastname: String
+    email: String
+    otherContacts: Map<string, string>
+}
+
+entity Tutor {
+    userId : Integer,
+}
+
+entity Client {
+    userId : Integer
+    money: Integer,
+}
+
+entity Category {
+    courseId: Integer
+    order: Integer
+    title: String
+    description: String
+}
+
+entity Lesson {
+    courseId : Integer
+    categoryId : Integer
+    title: String
+    content: String
+    order: Integer
+}
+
+Course }o--o{ Tutor
+Course }o--o{ Client
+Course ||--o{ Lesson
+Lesson ||--o| Category
+Client ||--o{ Lesson
+Lesson }|--|| Category
+@enduml

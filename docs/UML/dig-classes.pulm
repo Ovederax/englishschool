@@ -1,0 +1,49 @@
+@startuml
+
+class  Course {
+    name: String
+    price: Integer
+    clients: Client[]
+    author: Tutor
+    lessons : Lesson[]
+}
+
+class User {
+    login: String
+    password: String
+    firstname: String
+    lastname: String
+    email: String
+    otherContacts: Map<string, string>
+}
+
+class Tutor extends User {
+    courses: Course[]
+}
+
+class Client extends User {
+    money: Integer
+    learnedLesson: Lesson[]
+}
+
+class Category {
+    courseId: Integer
+    order: Integer
+    title: String
+    description: String
+}
+
+class Lesson {
+    title: String
+    content: String
+    order: Integer
+    category: Category?
+}
+
+Course "*" <-- "*" Tutor
+Course "*" <-- "*" Client
+Course "1" <-- "*" Lesson
+Lesson "*" --> "1" Category
+Course "1" <-- "*" Category
+
+@enduml
