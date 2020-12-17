@@ -1,6 +1,8 @@
 package com.example.controller
 
+import com.example.dto.response.lesson.LessonGetResponse
 import com.example.model.Lesson
+import com.example.model.categoriesDSL
 import com.example.service.LessonService
 import com.example.service.UserService
 import io.ktor.application.*
@@ -36,8 +38,8 @@ fun Application.lessonController(service: LessonService, userService: UserServic
         route("$path/{itemId}") {
             get {
                 parseId()?.let { id ->
-                    service.get(id)?.let { elem ->
-                        call.respond(elem)
+                    service.get(id)?.let { it ->
+                        call.respond(LessonGetResponse(it.title, it.order, it.content, categoriesDSL.read(it.categoryId)))
                     } ?: call.respond(HttpStatusCode.NotFound)
                 } ?: call.respond(HttpStatusCode.BadRequest)
             }

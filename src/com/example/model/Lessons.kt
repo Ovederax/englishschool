@@ -3,6 +3,7 @@ package com.example.model
 import com.example.dsl.Item
 import com.example.dsl.ItemTable
 import com.example.dsl.RepoDSL
+import com.example.dto.response.lesson.LessonGetResponse
 import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.select
@@ -50,5 +51,6 @@ object lessonsDSL: RepoDSL<Lesson>(lessons) {
     fun findByCourse(id: Int): List<Lesson> =
         transaction {
             lessons.select { lessons.courseId eq id }.map { lessons.readResult(it) }
+
         }
 }

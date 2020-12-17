@@ -36,9 +36,15 @@ object DatabaseFactory {
             it[amount] = 220
         }
 
+        val categoryId1 = categories.insertAndGetId {
+            it[order] = 1
+            it[title] = "Beginner"
+            it[description] = ""
+        }
+
         lessons.insert {
             it[courseId] = courseId1.value
-            it[categoryId] = -1
+            it[categoryId] = categoryId1.value
             it[order] = 1
             it[title] = "Lesson One"
             it[content] = "Text"

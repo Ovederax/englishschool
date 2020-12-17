@@ -1,16 +1,20 @@
 package com.example.service
 import com.example.dto.response.course.CourseGetResponse
+import com.example.dto.response.lesson.LessonGetResponse
 import com.example.model.*
 
 class CourseService {
     fun get(id: Int): CourseGetResponse? {
         val course = coursesDSL.read(id) ?: return null
         val lessons = lessonsDSL.findByCourse(id)
+        val responseLessons = lessons.map {
+            LessonGetResponse(it.title, it.order, it.content, categoriesDSL.read(it.categoryId))
+        }
         return CourseGetResponse(
                 course.id,
                 course.name,
                 course.amount,
-                lessons,
+                responseLessons,
         )
     }
 

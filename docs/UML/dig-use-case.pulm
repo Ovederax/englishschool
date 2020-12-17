@@ -25,13 +25,9 @@
 
         Tutor -- ("CRUD Course")
         Tutor -- ("CRUD Lesson in Course")
-        Tutor -- ("CRUD Material in Lesson")
-        Tutor -- ("CRUD Category to Course")
-        Tutor -- ("UD Category to Lesson")
+        Tutor -- ("CRUD Category to Lesson")
 
-        Client -- ("Buy Course")
         Client -- ("Read Lesson")
-        Client -- ("Done Lesson")
-        Client -- ("Get Course")
+        Client -- ("Read Course")
     }
 @enduml
