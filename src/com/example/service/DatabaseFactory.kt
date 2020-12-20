@@ -27,28 +27,28 @@ object DatabaseFactory {
     }
 
     private fun testData() {
-        val courseId1 = courses.insertAndGetId {
-            it[name] = "Course one"
-            it[amount] = 120
-        }
-        courses.insertAndGetId {
-            it[name] = "Course two"
-            it[amount] = 220
-        }
-
-        val categoryId1 = categories.insertAndGetId {
-            it[order] = 1
-            it[title] = "Beginner"
-            it[description] = ""
-        }
-
-        lessons.insert {
-            it[courseId] = courseId1.value
-            it[categoryId] = categoryId1.value
-            it[order] = 1
-            it[title] = "Lesson One"
-            it[content] = "Text"
-        }
+//        val courseId1 = courses.insertAndGetId {
+//            it[name] = "Course one"
+//            it[amount] = 120
+//        }
+//        courses.insertAndGetId {
+//            it[name] = "Course two"
+//            it[amount] = 220
+//        }
+//
+//        val categoryId1 = categories.insertAndGetId {
+//            it[order] = 1
+//            it[title] = "Beginner"
+//            it[description] = ""
+//        }
+//
+//        lessons.insert {
+//            it[courseId] = courseId1.value
+//            it[categoryId] = categoryId1.value
+//            it[order] = 1
+//            it[title] = "Lesson One"
+//            it[content] = "Text"
+//        }
     }
 
     suspend fun <T> dbQuery(

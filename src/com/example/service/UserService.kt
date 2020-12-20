@@ -98,6 +98,12 @@ class UserService {
         val loginUser = loginUserDSL.findByToken(token) ?: return null
         return usersDSL.read(loginUser.userId)
     }
+
+    fun getUserByToken(token: String): User? {
+        val loginUser = loginUserDSL.findByToken(token) ?: return null
+        return usersDSL.read(loginUser.userId)
+    }
+
     fun getClientByToken(call: ApplicationCall): ClientDTO? {
         val user = getUserByToken(call) ?: return null
         return getClientByUser(user)

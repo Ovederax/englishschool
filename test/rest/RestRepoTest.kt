@@ -1,113 +1,89 @@
 package rest
 
-import com.example.controller.courseController
+import com.example.controller.*
+import com.example.dto.request.user.UserLoginRequest
+import com.example.dto.request.user.UserRegisterRequest
+import com.example.service.DatabaseFactory
+import com.example.service.UserService
+import com.fasterxml.jackson.databind.SerializationFeature
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.http.*
-import io.ktor.serialization.*
+import io.ktor.jackson.*
+import io.ktor.routing.*
 import io.ktor.server.testing.*
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
-import com.example.repo.RepoMap
-import repo.TestItem
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 class RestRepoTest {
     private val testPath = "/items"
 
     @Test
-    fun restRepoMapTest() {
-        testRest  {
-            courseController(
-                RepoMap(),
-                testPath,
-                TestItem.serializer()
-            )
-        }
-    }
-
-
-    private fun testRest(
-            restModule: Application.() -> Unit
-    ) {
+    fun testRest() {
         withTestApplication({
+            install(CallLogging)
             install(ContentNegotiation) {
-                json()
-            }
-            restModule()
-        }) {
-
-            // Post
-            val itemsJson =
-                    arrayOf("one", "two", "three")
-                            .map {
-                                Json.encodeToString(
-                                        TestItem.serializer(),
-                                        TestItem(it)
-                                )
-                            }
-            itemsJson.map {
-                handleRequest(HttpMethod.Post, testPath) {
-                    setBodyAndHeaders(it)
-                }.apply {
-                    assertStatus(HttpStatusCode.OK)
+                jackson {
+                    configure(SerializationFeature.INDENT_OUTPUT, true)
                 }
             }
-            handleRequest(HttpMethod.Post, testPath) {
+            DatabaseFactory.init()
+            val userService = UserService()
+            install(Routing) {
+                userController(userService)
+            }
+        }) {
+            val registerJson = Json.encodeToString(
+                UserRegisterRequest.serializer(),
+                UserRegisterRequest(
+                "login",
+                "password",
+                "firstname",
+                "lastname",
+                "email",
+                HashMap()
+            ))
+
+            var token: String?
+
+            handleRequest(HttpMethod.Post, "/user/tutor") {
+                setBodyAndHeaders(registerJson)
+            }.apply {
+                token = response.headers["Set-Cookie"]?.split(";")?.get(0)
+                assertNotNull(token)
+                assertStatus(HttpStatusCode.OK)
+            }
+
+            handleRequest(HttpMethod.Post, "/user/tutor") {
                 setBodyAndHeaders("Wrong JSON")
             }.apply {
                 assertStatus(HttpStatusCode.BadRequest)
             }
 
-            // Get
-            val items = handleRequest(HttpMethod.Get, testPath).run {
-                assertStatus(HttpStatusCode.OK)
-                parseResponse(
-                        ListSerializer(TestItem.serializer())
-                )
-            }
-            assertEquals(3, items?.size)
-            handleRequest(HttpMethod.Get, "$testPath/${items?.first()?.id}").run {
-                assertStatus(HttpStatusCode.OK)
-                val item = parseResponse(TestItem.serializer())
-                assertEquals(items?.first()?.name, item?.name)
-            }
-
-            // Put
-
-            val three = items?.find { it.name == "three" }!!
-            val threeNew = TestItem("three new", three.id)
-            handleRequest(HttpMethod.Put, "$testPath/${threeNew.id}") {
-                setBodyAndHeaders(Json.encodeToString(TestItem.serializer(), threeNew))
-            }.run {
-                assertStatus(HttpStatusCode.OK)
-            }
-            handleRequest(HttpMethod.Get, "$testPath/${threeNew.id}").run {
-                assertStatus(HttpStatusCode.OK)
-                val item = parseResponse(TestItem.serializer())
-                assertEquals("three new", item?.name)
-            }
-
-            // Delete
-            val two = items.find { it.name == "two" }!!
-            handleRequest(HttpMethod.Delete, "$testPath/${two.id}").run {
+            handleRequest(HttpMethod.Post, "/user/logout"){
+                setBodyAndHeaders("")
+                token?.let { addHeader("Cookie", it) }
+            }.apply {
                 assertStatus(HttpStatusCode.OK)
             }
 
-            // Final check
-            val itemsNewName = handleRequest(HttpMethod.Get, testPath).run {
+            val loginJson = Json.encodeToString(
+                UserLoginRequest.serializer(),
+                UserLoginRequest(
+                    "login",
+                    "password",
+                ))
+
+            handleRequest(HttpMethod.Post, "/user/login") {
+                setBodyAndHeaders(loginJson)
+            }.apply {
+                assertNotNull(response.headers["Set-Cookie"])
                 assertStatus(HttpStatusCode.OK)
-                parseResponse(
-                        ListSerializer(TestItem.serializer())
-                )
-            }?.map { it.name }!!
-
-            assert(itemsNewName.size == 2)
-            assert(itemsNewName.contains("one"))
-            assert(itemsNewName.contains("three new"))
-
+            }
         }
     }
 }

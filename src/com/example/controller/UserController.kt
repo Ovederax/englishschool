@@ -79,23 +79,21 @@ fun Route.userController(userService: UserService) {
 
         post("logout") {
             logger.debug("logout")
-            parseBody(UserLoginRequest.serializer())?.let {
-                try {
-                    val token = call.request.cookies[COOKIE_NAME]
-                    if(token === null) {
-                        call.respond(HttpStatusCode.BadRequest)
-                    }
-                    token?.let {
-                        if(userService.logout(token)) {
-                            call.respond(HttpStatusCode.OK)
-                        } else {
-                            call.respond(HttpStatusCode.BadRequest)
-                        }
-                    }
-                } catch (ignored: Exception) {
+            try {
+                val token = call.request.cookies[COOKIE_NAME]
+                if(token === null) {
                     call.respond(HttpStatusCode.BadRequest)
                 }
-            } ?: call.respond(HttpStatusCode.BadRequest)
+                token?.let {
+                    if(userService.logout(token)) {
+                        call.respond(HttpStatusCode.OK)
+                    } else {
+                        call.respond(HttpStatusCode.BadRequest)
+                    }
+                }
+            } catch (ignored: Exception) {
+                call.respond(HttpStatusCode.BadRequest)
+            }
         }
     }
 }
